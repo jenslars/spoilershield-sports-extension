@@ -1,10 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/pages/popup.jsx', // Your React entry point
+  entry: {
+    jsx: './src/pages/popup.jsx',
+    testscript: '/src/pages/testscript.js'}, // Your React entry point
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'popup.bundle.js', // The bundled output file
+    filename: '[name].bundle.js', // The bundled output file
   },
   module: {
     rules: [

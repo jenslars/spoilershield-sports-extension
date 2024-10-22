@@ -1,14 +1,15 @@
 {
   "manifest_version": 2,
   "name": "SpoilerShield",
-  "version": "0.1",
+  "version": "0.2",
   "description": "SpoilerShield is an extension that will block spoilers from your selected sports and games",
   "permissions": ["storage", "activeTab", "tabs"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "browser_action": {
-    "default_popup": "public/popup.html",
-    "default_icon": "assets/icon.png"
+    "default_popup": "./popup.html",
+    "default_icon": "./SpoilerShield.png"
   },
   "icons": {
-    "48": "assets/icon.png"
+    "48": "./SpoilerShield.png"
   }
 }
