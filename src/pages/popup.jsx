@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import HeaderSection from '../components/HeaderSection/HeaderSection';
 
 const Popup = () => {
   return (
     <div>
-      <h1>My Firefox Extension</h1>
-      <p>Welcome to my React-based Firefox extension!</p>
+      <HeaderSection/>
     </div>
   );
 };

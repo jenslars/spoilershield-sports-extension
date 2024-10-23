@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    jsx: './src/pages/popup.jsx',
+    popup: './src/pages/popup.jsx',
     testscript: '/src/pages/testscript.js'}, // Your React entry point
   output: {
     path: path.resolve(__dirname, 'build'),
