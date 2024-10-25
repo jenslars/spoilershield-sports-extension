@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import HeaderSection from '../components/HeaderSection/HeaderSection';
+import PopupContainer from '../components/PopupContainer/PopupContainer';
 
 const Popup = () => {
   return (
     <div>
-      <HeaderSection/>
+      <PopupContainer/>
     </div>
   );
 };
