@@ -1,13 +1,24 @@
 const path = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+const env = dotenv.config().parsed || {};
+
+// Convert the environment variables to a format DefinePlugin expects
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   entry: {
     popup: './src/pages/popup.jsx',
-    testscript: './src/pages/testscript.js' // Fixed the path (added the correct dot-slash)
+    testscript: './src/pages/testscript.js',
   },
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: '[name].bundle.js', // The bundled output file
+    filename: '[name].bundle.js',
   },
   module: {
     rules: [
@@ -22,13 +33,17 @@ module.exports = {
         },
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/i,  // Rule for image files
+        test: /\.css$/,  // Rule for CSS files
+        use: ['style-loader', 'css-loader'],  // Use both style-loader and css-loader
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot)$/i,  // Rule for image and font files
         use: [
           {
             loader: 'file-loader',
             options: {
-              name: '[name].[ext]', // Keep original name and extension
-              outputPath: 'assets/icons', // Output path for images
+              name: '[name].[ext]',  // Keep original file name and extension
+              outputPath: 'assets',  // Output to /build/assets
             },
           },
         ],
@@ -36,6 +51,9 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'], // Support .js and .jsx file extensions
+    extensions: ['.js', '.jsx'],
   },
+  plugins: [
+    new webpack.DefinePlugin(envKeys), // Add DefinePlugin for environment variables
+  ],
 };

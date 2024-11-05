@@ -1,10 +1,17 @@
 import React from 'react';
-import HeaderRightSection from "./HeaderRigthSection/HeaderRightSection"
+import HeaderRightSection from "./HeaderRightSection/HeaderRightSection";
+import HeaderLeftSection from './HeaderLeftSection/HeaderLeftSection';
+import MonthYearLabel from './HeaderMiddleSection/MonthYearLabel/MonthYearLabel';
+import { StyledHeader } from './styles';
 
-const HeaderSection = () => {
+const HeaderSection = ({ monthYear }) => {
     return (
-        <HeaderRightSection/>
-    )
-}
+        <StyledHeader>
+            <HeaderLeftSection />
+            <MonthYearLabel monthYear={monthYear} />
+            <HeaderRightSection />
+        </StyledHeader>
+    );
+};
 
 export default HeaderSection;
