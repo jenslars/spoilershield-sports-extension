@@ -1,24 +1,31 @@
 import React from 'react';
 import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
-import OptionsIcon from "../../../../assets/icons/OptionsIcon.png";
-import CalendarIcon from "../../../../assets/icons/CalendarIcon.png";
+import { ReactComponent as CalendarIcon } from '../../../../assets/icons/svg/CalendarIcon.svg';
+import { ReactComponent as SettingsIcon } from '../../../../assets/icons/svg/SettingsIcon.svg';
 import { StyledHeaderRightSection } from './styles';
+import PickerWithButtonField from '../DateCalendar/DateCalendar';
 
 const HeaderRightSection = () => {
+  const handleClickA = () => {
+    console.log("Button A clicked!");
+  };
+
+  const handleClickB = () => {
+    console.log("Button B clicked!");
+  };
+
   return (
     <StyledHeaderRightSection>
-      <HeaderSectionButton icon={CalendarIcon} onClick={handleClickA} />
-      <HeaderSectionButton icon={OptionsIcon} onClick={handleClickB} />
+      <HeaderSectionButton 
+        IconComponent={CalendarIcon} 
+        onClick={handleClickA} 
+      />
+      <HeaderSectionButton 
+        IconComponent={SettingsIcon} 
+        onClick={handleClickB} 
+      />
     </StyledHeaderRightSection>
   );
-};
-
-const handleClickA = () => {
-  console.log("Button A clicked!");
-};
-
-const handleClickB = () => {
-  console.log("Button B clicked!");
 };
 
 export default HeaderRightSection;

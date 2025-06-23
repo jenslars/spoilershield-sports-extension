@@ -1,12 +1,10 @@
 import React from 'react';
 import { StyledButton } from './styles.js';
 
-
-const HeaderSectionButton = ({ icon, label, onClick }) => {
+const HeaderSectionButton = ({ IconComponent, label, onClick }) => {
   return (
     <StyledButton onClick={onClick}>
-      {icon && <img src={icon} width="20" height="20" />} {/* Display icon if passed */}
-      {label}
+      {IconComponent && <IconComponent />} {/* Render IconComponent if provided */}
     </StyledButton>
   );
 };

@@ -23,7 +23,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,  // Rule for JS and JSX files
+        test: /\.jsx?$/, // Rule for JS and JSX files
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -33,17 +33,35 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/,  // Rule for CSS files
-        use: ['style-loader', 'css-loader'],  // Use both style-loader and css-loader
+        test: /\.css$/, // Rule for CSS files
+        use: ['style-loader', 'css-loader'], // Use both style-loader and css-loader
       },
       {
-        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot)$/i,  // Rule for image and font files
+        test: /\.(png|jpe?g|gif|woff|woff2|ttf|eot)$/i, // Rule for image and font files
         use: [
           {
             loader: 'file-loader',
             options: {
-              name: '[name].[ext]',  // Keep original file name and extension
-              outputPath: 'assets',  // Output to /build/assets
+              name: '[name].[ext]', // Keep original file name and extension
+              outputPath: 'assets', // Output to /build/assets
+            },
+          },
+        ],
+      },
+      {
+        test: /\.svg$/, // Rule specifically for SVG files
+        use: [
+          {
+            loader: '@svgr/webpack', // Use SVGR for importing SVGs as React components
+            options: {
+              icon: true, // Optional: configure SVGR (e.g., for icon optimization)
+            },
+          },
+          {
+            loader: 'file-loader', // Fallback to file-loader for SVG files
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets',
             },
           },
         ],

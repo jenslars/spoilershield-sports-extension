@@ -62,21 +62,3 @@ export const StyledDateNumber = styled.div`
       color: #6CA9ED
   ` :''}
 `;
-
-export const StyledMarker = styled.div`
-  width: 20px;
-  height: 3px;
-  margin: auto;
-  margin-top: 3px;
-  background-color: transparent; /* Default color */
-
-  &.active {
-    background-color: #1790FF;
-    transition: 0.33s;
-  }
-
-  ${StyledDay}:hover & {
-    background-color: #1790FF;
-    transition: 0.33s;
-    }
-`;

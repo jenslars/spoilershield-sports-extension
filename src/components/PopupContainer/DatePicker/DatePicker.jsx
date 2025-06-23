@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavigateLeftButton from './NavigateLeftButton/NavigateLeftButton';
 import NavigateRightButton from './NavigateRightButton/NavigateRightButton';
 import DateSection from './DateSection/DateSection';
@@ -15,12 +15,13 @@ const generateDateRange = (startDate, days) => {
   return dates;
 };
 
-const DatePicker = ({ updateMonthYear }) => {
+const DatePicker = ({ updateMonthYear, onDateChange }) => {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [dateRange, setDateRange] = useState([]);
+  const today = new Date();
+  const [activeDay, setActiveDay] = useState(today);
 
   useEffect(() => {
-    const today = new Date();
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - 365);
     const dates = generateDateRange(startDate, 730);
@@ -34,12 +35,12 @@ const DatePicker = ({ updateMonthYear }) => {
     setCurrentWeekIndex(initialWeekIndex);
 
     updateMonthYear(dates[todayIndex]);
+    onDateChange(dates[todayIndex]); // Load initial schedule for today's date
   }, []);
 
   const currentWeek = dateRange.slice(currentWeekIndex * 7, (currentWeekIndex + 1) * 7);
 
-
-  // Navigate to the next week 
+  // Navigate to the previous week
   const handlePrevWeek = () => {
     setCurrentWeekIndex((prevIndex) => {
       if (prevIndex > 0) {
@@ -63,10 +64,21 @@ const DatePicker = ({ updateMonthYear }) => {
     });
   };
 
+  // Handle day selection
+  const handleDayClick = (selectedDate) => {
+    setActiveDay(selectedDate);
+    updateMonthYear(selectedDate);
+    onDateChange(selectedDate); 
+  };
+
   return (
     <StyledDatePicker>
       <NavigateLeftButton onClick={handlePrevWeek} />
-      <DateSection currentWeek={currentWeek} />
+      <DateSection 
+        currentWeek={currentWeek} 
+        activeDay={activeDay} 
+        onDayClick={handleDayClick} 
+      />
       <NavigateRightButton onClick={handleNextWeek} />
     </StyledDatePicker>
   );

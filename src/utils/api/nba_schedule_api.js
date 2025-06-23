@@ -16,6 +16,7 @@ export const fetchNBASchedule = async (date) => {
     try {
         const response = await axios.get(apiUrl, options);
         console.log(response.data); 
+        return  response.data;
     } catch (error) {
         console.error('Error fetching schedule:', error);
         throw error;
@@ -24,8 +25,8 @@ export const fetchNBASchedule = async (date) => {
 
 // Fetches and returns player data from respective team and season
 export const fetchPlayerData = async (homeTeamId, awayTeamId, season) => {
-    const apiKey = env.REACT_APP_NBA_API_KEY;
-    const apiHost = env.REACT_APP_NBA_API_HOST;
+    const apiKey = process.env.REACT_APP_NBA_API_KEY;
+    const apiHost = process.env.REACT_APP_NBA_API_HOST;
     
     const homeTeamUrl = `https://api-nba-v1.p.rapidapi.com/players?team=${homeTeamId}&season=${season}`;
     const awayTeamUrl = `https://api-nba-v1.p.rapidapi.com/players?team=${awayTeamId}&season=${season}`;

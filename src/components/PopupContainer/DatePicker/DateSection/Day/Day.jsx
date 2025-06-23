@@ -4,7 +4,6 @@ import {
   StyledDay,
   StyledWeekday,
   StyledWeekdayBackground,
-  StyledMarker
 } from './styles';
 
 const Day = ({ date, isActive, onClick }) => {
@@ -22,7 +21,6 @@ const Day = ({ date, isActive, onClick }) => {
         <StyledWeekday isToday={isToday} isActive={isActive}>{weekdayLetter}</StyledWeekday>
         <StyledDateNumber isToday={isToday} isActive={isActive}>{dayNumber}</StyledDateNumber>
       </StyledWeekdayBackground>
-      <StyledMarker className={isActive ? 'active' : ''}></StyledMarker>
     </StyledDay>
   );
 };
