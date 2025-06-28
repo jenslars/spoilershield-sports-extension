@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyledEventContainer = styled.div`
     width: 100%;
-    height: 64px;
+    height: 99px;
     background-color: #2D2D2D;
     border-radius: 10px;
     margin-top: 5px;

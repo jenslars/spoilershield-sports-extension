@@ -13,8 +13,7 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
 
 module.exports = {
   entry: {
-    popup: './src/pages/popup.jsx',
-    testscript: './src/pages/testscript.js',
+    popup: './src/extension/popup/PopupApp.jsx',
   },
   output: {
     path: path.resolve(__dirname, 'build'),

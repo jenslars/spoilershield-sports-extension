@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
 import { StyledHeaderLeftSection } from './styles';
-import BlockedEventsOverlay from '../../BlockedEvents/BlockedEventsOverlay/BlockedEventsOverlay';
 import { ReactComponent as MenuIcon } from '../../../../assets/icons/svg/MenuIcon.svg';
 
 const HeaderLeftSection = () => {
@@ -19,11 +18,6 @@ const HeaderLeftSection = () => {
         IconComponent={MenuIcon} 
         onClick={() => setOverlayVisible(true)} 
       />
-      
-      {/* Conditionally render the overlay */}
-      {isOverlayVisible && (
-        <BlockedEventsOverlay onClose={handleOverlayClose} />
-      )}
     </StyledHeaderLeftSection>
   );
 };

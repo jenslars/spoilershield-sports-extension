@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const StyledNagivateRightButton = styled.button`
+export const StyledNagivateLeftButton = styled.button`
     background-size: 25px;
     height: 25px;
     width: 25px;
@@ -11,10 +11,10 @@ export const StyledNagivateRightButton = styled.button`
     transition: transform 0.2s ease, background-color 0.2s ease;
 
     &:hover {
-        transform: scale(1.1);
-        background-color: rgba(0, 0, 0, 0.1);
+        transform: scale(1.1); 
     }
 
     &:active {
-        transform: scale(0.95);
+        transform: scale(0.95); 
+    }
 `;
