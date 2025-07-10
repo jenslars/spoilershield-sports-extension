@@ -1,7 +1,7 @@
 import React from 'react';
 import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
-import { ReactComponent as CalendarIcon } from '../../../../assets/icons/svg/CalendarIcon.svg';
-import { ReactComponent as SettingsIcon } from '../../../../assets/icons/svg/SettingsIcon.svg';
+import CalendarIcon from '../../../../assets/icons/svg/CalendarIcon.svg';
+import OptionsVertIcon from '../../../../assets/icons/svg/OptionsVertIcon.svg';
 import { StyledHeaderRightSection } from './styles';
 import PickerWithButtonField from '../DateCalendar/DateCalendar';
 
@@ -21,7 +21,7 @@ const HeaderRightSection = () => {
         onClick={handleClickA} 
       />
       <HeaderSectionButton 
-        IconComponent={SettingsIcon} 
+        IconComponent={OptionsVertIcon} 
         onClick={handleClickB} 
       />
     </StyledHeaderRightSection>

@@ -9,7 +9,7 @@ export const StyledButton = styled.button`
   cursor: pointer;
   
   svg {
-    width: 24px;
-    height: 24px;
+    width: auto;
+    height: 20px;
   }
 `;

@@ -6,5 +6,5 @@ export const StyledHeader = styled.div`
     align-items: center;
     justify-content: space-between
     width: 90%;
-    margin-top: 20px;
+    margin-top: 10px;
 `;

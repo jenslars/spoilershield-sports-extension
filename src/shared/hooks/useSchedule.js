@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { fetchNBASchedule } from '../utils/api/nba_schedule_api';
+import nbaLogo from '../../assets/competition-logos/nba.svg';
+import f1Logo from '../../assets/competition-logos/f1.svg';
 
 export const useSchedule = () => {
   const [monthYear, setMonthYear] = useState({ month: '', year: '' });
@@ -34,7 +36,7 @@ export const useSchedule = () => {
           id: 1,
           isHeadToHead: true,
           sport: 'NBA',
-          competitionImage: '../../assets/images/nba.png',
+          competitionImage: 'https://cdn.brandfetch.io/idFBraEt77/theme/light/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B',
           date: { start: new Date(Date.now() + 3600 * 1000).toISOString() },
           teams: {
             home: {
@@ -42,7 +44,7 @@ export const useSchedule = () => {
               name: 'Raptors',
               nickname: 'Raptors',
               code: 'TOR',
-              logo: 'https://en.wikipedia.org/wiki/Toronto_Raptors#/media/File:Toronto_Raptors_logo.svg',
+              logo: 'https://upload.wikimedia.org/wikipedia/en/3/36/Toronto_Raptors_logo.svg',
             },
             visitors: {
               id: 20,
@@ -62,7 +64,7 @@ export const useSchedule = () => {
           id: 2,
           isHeadToHead: true,
           sport: 'NBA',
-          competitionImage: '../../assets/images/nba.png',
+          competitionImage: 'https://cdn.brandfetch.io/idFBraEt77/theme/light/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B',
           date: { start: new Date(Date.now() + 3600 * 1000).toISOString() },
           teams: {
             home: {
@@ -90,14 +92,16 @@ export const useSchedule = () => {
           id: 3,
           isHeadToHead: false,
           sport: 'F1',
-          competitionImage: '../../assets/images/f1.png',
+          competitionImage: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/F1_%28registered_trademark%29.svg',
           date: { start: new Date(Date.now() + 3600 * 1000).toISOString() },
           eventTitle: 'Bahrain',
           eventImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Bahrain.svg/1200px-Flag_of_Bahrain.svg.png',
           eventDescription: 'FORMULA 1 BAHRAIN GRAND PRIX 2025',
-          eventDetailVenue: 'Bahrain International Circuit',
-          eventDetailType: 'Qualifying',
-          eventDetailValue: 'Round 18'
+          eventDetails: {
+            eventDetailVenue: 'Bahrain International Circuit',
+            eventDetailType: 'Qualifying',
+            eventDetailValue: 'Round 18'
+          }
         }
       ],
     });

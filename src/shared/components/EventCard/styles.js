@@ -1,145 +1,114 @@
 import styled from "styled-components";
 
 export const StyledEventContainer = styled.div`
+    position: relative;
+    overflow: hidden;
     width: 100%;
     height: 99px;
     background-color: #2D2D2D;
     border-radius: 10px;
     margin-top: 5px;
+    display: flex;
     flex-direction: row;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    display: grid;
-    grid-template-columns: 80px 20px 80px 1px 60px;
-    grid-gap: 16px;
-    align-items: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+`;
+
+export const BlockedEventOverlay = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: #5E5E5E;
+    border-radius: 10px;
+    z-index: 0;
+    pointer-events: none;
+    transition: 0.5s;
+    
+    &.active {
+        width: 100%;
+        transition: 0.5s;
+    }
+`;
+
+export const StyledLeftSection = styled.div`
     position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 66%;
+    margin-left: 10px;
+    justify-content: space-between;
 `;
 
-export const StyledTeamSection = styled.div`
+export const StyledEventDetails = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: 8px;
+    color: #ACACAC;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 300;
+    margin-bottom: 10px;
+`;
+
+export const StyledAsideSection = styled.div`
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 10px;
-`
+    gap: 8px;
+    width: 34%;
+    font-weight: 400;
+`;
 
-export const StyledTeamLogo = styled.img`
-    display: block;
-    height: 35px;
-    width: auto; 
-    margin: 0 auto; 
-`
+export const StyledTime = styled.div`
+    font-size: 22px;
+    margin-bottom: -5px;
+`;
 
-export const StyledTeamName = styled.p`
-    font-size: 10px;
-    text-align: center;
-    margin-top: 2px;
-    width: 100%;
-`
-
-export const StyledTimeSection = styled.div`
+export const StyledBlockButton = styled.div`
+    position: relative;
+    overflow: hidden;
+    height: 25px;
+    width: 75px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-`
-
-export const StyledTime = styled.p`
+    background: #4A4A4A;
+    color: #fff;
+    border-radius: 20px;
     font-size: 14px;
-    font-weight: 700;
-`
-
-export const StyledDate = styled.p`
-    margin-top: -10px;
-    font-size: 10px;
-    color: #7C7C7C;
-`
-
-export const EventDivider = styled.div`
-    width: 1px;
-    background-color: #FFFFFF;
-    height: 40px;
-    margin-left: auto;
-    margin-right: auto;
-`
-
-export const HideSpoilersSection = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: center;
-    width: 100%;
+    font-weight: 400;
     cursor: pointer;
-`
-
-export const HideSpoilersButton = styled.p`
-    color: #eeeeee;
-    transition: 0.2s;
-`
-
-export const StyledBlockedOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(75, 75, 75, 0.9);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  border-radius: 10px;
-  backdrop-filter: blur(5px);
+    user-select: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
-export const StyledOverlayEventDetails = styled.div`
-  display: flex; /* Ensure horizontal alignment */
-  flex: 1; /* Take up equal space */
-  flex-direction: column;
-  justify-content: center; /* Center text vertically */
-  width: 49%; /* Take up 40% of the space */
-  margin: auto auto 2px;
-`;
+export const BlockedButtonOverlay = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: #4A4A4A;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    z-index: 2;
+    pointer-events: none;
+    transition: 0.5s;
 
-export const StyledCompetitors = styled.p`
-  font-size: 14px;
-  margin: auto auto 2px;
-`;
-
-export const StyledStartTime = styled.p`
-  font-size: 12px;
-  margin: auto auto 2px;
-`;
-
-export const StyledStartDate = styled.p`
-  font-size: 10px;
-  color: #8C8C8C;
-  margin: auto auto 2px;
-`;
-
-export const StyledDividerSection = styled.div`
-  display: flex; /* Center content within this section */
-  justify-content: center;
-  align-items: center;
-  width: 2%; /* Adjust width as needed */
-`;
-
-export const StyledBlockedEventDivider = styled.div`
-  width: 1px;
-  background-color: #FFFFFF;
-  height: 40px;
-  margin: auto; /* Center the divider */
-`;
-
-export const StyledStatus = styled.div`
-  display: flex;
-  align-items: center; /* Center content vertically */
-  justify-content: center; /* Center content horizontally */
-  font-size: 14px;
-  flex: 1; /* Take up equal space */
-  width: 49%;
-  margin: auto;
+    &.active {
+        width: 100%;
+        transition: 0.5s;
+    }
 `;

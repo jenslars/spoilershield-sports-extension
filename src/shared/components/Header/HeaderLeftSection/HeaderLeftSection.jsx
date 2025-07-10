@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
 import { StyledHeaderLeftSection } from './styles';
-import { ReactComponent as MenuIcon } from '../../../../assets/icons/svg/MenuIcon.svg';
+import ListCheckedIcon from '../../../../assets/icons/svg/ListCheckedIcon.svg';
 
 const HeaderLeftSection = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -15,7 +15,7 @@ const HeaderLeftSection = () => {
     <StyledHeaderLeftSection>
       {/* Button to open the overlay */}
       <HeaderSectionButton 
-        IconComponent={MenuIcon} 
+        IconComponent={ListCheckedIcon} 
         onClick={() => setOverlayVisible(true)} 
       />
     </StyledHeaderLeftSection>

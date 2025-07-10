@@ -56,13 +56,6 @@ module.exports = {
               icon: true, // Optional: configure SVGR (e.g., for icon optimization)
             },
           },
-          {
-            loader: 'file-loader', // Fallback to file-loader for SVG files
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'assets',
-            },
-          },
         ],
       },
     ],
