@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test</title>
+    <style>
+        /* Test CSS variables */
+        :root {
+            --color-background: #f9fafb;
+            --color-surface: #ffffff;
+            --color-text-primary: #111827;
+        }
+        
+        .dark {
+            --color-background: #0f172a;
+            --color-surface: #1e293b;
+            --color-text-primary: #f8fafc;
+        }
+        
+        body {
+            background-color: var(--color-background);
+            color: var(--color-text-primary);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .test-card {
+            background-color: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .theme-toggle:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    
+    <div class="test-card">
+        <h1>Theme Test Page</h1>
+        <p>This page helps you test if the theme detection is working correctly.</p>
+        <p><strong>Current theme:</strong> <span id="current-theme">detecting...</span></p>
+        <p><strong>System preference:</strong> <span id="system-theme">detecting...</span></p>
+    </div>
+    
+    <div class="test-card">
+        <h2>Test Content</h2>
+        <p>This is some test content to see how the theme looks.</p>
+        <p>If you can see this text clearly and the background is appropriate for your theme preference, then the theme is working correctly.</p>
+    </div>
+    
+    <script>
+        // Theme detection logic (same as your useTheme hook)
+        function detectTheme() {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const isDark = mediaQuery.matches;
+            
+            document.documentElement.classList.toggle('dark', isDark);
+            
+            // Update indicators
+            document.getElementById('current-theme').textContent = 
+                document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            document.getElementById('system-theme').textContent = 
+                mediaQuery.matches ? 'dark' : 'light';
+            
+            console.log('Theme detected:', isDark ? 'dark' : 'light');
+        }
+        
+        // Manual theme toggle
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.documentElement.classList.toggle('dark', !isDark);
+            document.getElementById('current-theme').textContent = !isDark ? 'dark' : 'light';
+        }
+        
+        // Initialize theme detection
+        detectTheme();
+        
+        // Listen for system theme changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', detectTheme);
+    </script>
+</body>
+</html> 

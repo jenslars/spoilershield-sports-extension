@@ -13,7 +13,7 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
 
 module.exports = {
   entry: {
-    popup: './src/extension/popup/PopupApp.jsx',
+    popup: './src/extension/popup/PopupApp.tsx',
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -22,7 +22,21 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/, // Rule for JS and JSX files
+        test: /\.(ts|tsx)$/, // Added TypeScript support
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env', 
+              '@babel/preset-react',
+              '@babel/preset-typescript' // Added TypeScript preset
+            ],
+          },
+        },
+      },
+      {
+        test: /\.jsx?$/, // Keep for existing JSX files during transition
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -32,8 +46,8 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/, // Rule for CSS files
-        use: ['style-loader', 'css-loader'], // Use both style-loader and css-loader
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader'], // Added postcss-loader
       },
       {
         test: /\.(png|jpe?g|gif|woff|woff2|ttf|eot)$/i, // Rule for image and font files
@@ -61,9 +75,16 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'], // TypeScript extensions
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@/components': path.resolve(__dirname, 'src/shared/components'),
+      '@/hooks': path.resolve(__dirname, 'src/shared/hooks'),
+      '@/utils': path.resolve(__dirname, 'src/shared/utils'),
+      '@/types': path.resolve(__dirname, 'src/shared/types'),
+    },
   },
   plugins: [
-    new webpack.DefinePlugin(envKeys), // Add DefinePlugin for environment variables
+    new webpack.DefinePlugin(envKeys),
   ],
 };

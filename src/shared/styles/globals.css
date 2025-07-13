@@ -1,19 +1,105 @@
-/* globals.css */
-
+/* src/shared/styles/globals.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
 
-body {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-
-    margin: 0;
-    padding: 0;
-    display: flex;
-    background-color: #202020;
-    border: none;
-    outline: none;
-    box-shadow: none;
-  }
+@theme {
+  --color-background: theme('colors.gray.50');
+  --color-surface: theme('colors.white');
+  --color-surface-overlay: theme('colors.gray.200');
+  --color-interactive: theme('colors.gray.200');
+  --color-interactive-hover: theme('colors.gray.300');
+  --color-interactive-overlay: theme('colors.gray.100');
+  --color-text-primary: theme('colors.gray.900');
+  --color-text-secondary: theme('colors.gray.800');
+  --color-text-tertiary: theme('colors.gray.600');
+  --color-icon-button: theme('colors.gray.900');
   
+  --font-family-inter: 'Inter', sans-serif;
+  --border-radius-card: 0.5rem;
+  --border-radius-button: 9999px;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-button: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
 
+@layer base {
+  :root {
+    /* Light theme */
+    --color-background: theme('colors.gray.50');
+    --color-surface: theme('colors.white');
+    --color-surface-overlay: theme('colors.gray.200');
+    --color-interactive: theme('colors.gray.200');
+    --color-interactive-hover: theme('colors.gray.300');
+    --color-interactive-overlay: theme('colors.gray.100');
+    --color-text-primary: theme('colors.gray.900');
+    --color-text-secondary: theme('colors.gray.800');
+    --color-text-tertiary: theme('colors.gray.600');
+    --color-icon-button: theme('colors.gray.900');
+  }
 
+  .dark {
+    /* Dark theme */
+    --color-background: theme('colors.zinc.900');
+    --color-surface: theme('colors.zinc.800');
+    --color-surface-overlay: theme('colors.zinc.500');
+    --color-interactive: theme('colors.zinc.700');
+    --color-interactive-hover: theme('colors.zinc.600');
+    --color-interactive-overlay: theme('colors.zinc.400');
+    --color-text-primary: theme('colors.zinc.50');
+    --color-text-secondary: theme('colors.zinc.100');
+    --color-text-tertiary: theme('colors.zinc.300');
+    --color-icon-button: theme('colors.zinc.50');
+  }
+
+  /* Shared shadows for both themes */
+  :root, .dark {
+    --shadow-card: theme('boxShadow.xs');
+    --shadow-card-button: theme('boxShadow.2xs');
+  }
+
+  body {
+    @apply font-semibold m-0 p-0 flex;
+    background-color: var(--color-background);
+    font-family: var(--font-family-inter);
+  }
+}
+
+/* Utility classes for theme colors */
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.text-text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-text-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+.bg-surface-overlay {
+  background-color: var(--color-surface-overlay);
+}
+
+.bg-interactive {
+  background-color: var(--color-interactive);
+}
+
+.bg-interactive-hover {
+  background-color: var(--color-interactive-hover);
+}
+
+.bg-interactive-overlay {
+  background-color: var(--color-interactive-overlay);
+}
+
+.text-icon-button {
+  color: var(--color-icon-button);
+}

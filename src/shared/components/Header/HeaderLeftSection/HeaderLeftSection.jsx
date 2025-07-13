@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
 import { StyledHeaderLeftSection } from './styles';
 import ListCheckedIcon from '../../../../assets/icons/svg/ListCheckedIcon.svg';
+import SlidingPanel from '../../SlidingPanel';
 
 const HeaderLeftSection = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -12,13 +13,28 @@ const HeaderLeftSection = () => {
   };
 
   return (
-    <StyledHeaderLeftSection>
-      {/* Button to open the overlay */}
-      <HeaderSectionButton 
-        IconComponent={ListCheckedIcon} 
-        onClick={() => setOverlayVisible(true)} 
-      />
-    </StyledHeaderLeftSection>
+    <>
+      <StyledHeaderLeftSection>
+        {/* Button to open the overlay */}
+        <HeaderSectionButton 
+          IconComponent={ListCheckedIcon} 
+          onClick={() => setOverlayVisible(true)} 
+        />
+      </StyledHeaderLeftSection>
+      
+      {/* Sliding Panel */}
+      <SlidingPanel 
+        direction="left" 
+        isOpen={isOverlayVisible}
+        onClose={handleOverlayClose}
+      >
+        <div>
+          <h2>Blocked Events</h2>
+          <p>This is the content that will slide in from the left.</p>
+          <button onClick={handleOverlayClose}>Close</button>
+        </div>
+      </SlidingPanel>
+    </>
   );
 };
 
