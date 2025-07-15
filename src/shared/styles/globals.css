@@ -17,8 +17,6 @@
   --font-family-inter: 'Inter', sans-serif;
   --border-radius-card: 0.5rem;
   --border-radius-button: 9999px;
-  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-button: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 @layer base {
@@ -48,12 +46,6 @@
     --color-text-secondary: theme('colors.zinc.100');
     --color-text-tertiary: theme('colors.zinc.300');
     --color-icon-button: theme('colors.zinc.50');
-  }
-
-  /* Shared shadows for both themes */
-  :root, .dark {
-    --shadow-card: theme('boxShadow.xs');
-    --shadow-card-button: theme('boxShadow.2xs');
   }
 
   body {

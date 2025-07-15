@@ -11,8 +11,8 @@ import { useSpoilerData } from '../../hooks/useSpoilerData';
 const eventCardVariants = tv({
   slots: {
     container: [
-      "relative overflow-hidden w-full h-[99px] rounded-lg mt-[5px] flex flex-row shadow-card",
-      "bg-surface"
+      "relative overflow-hidden w-full h-[99px] rounded-lg mt-[5px] flex flex-row shadow-sm transition-all duration-200",
+      "bg-surface hover:shadow-md"
     ],
     leftSection: [
       "relative z-10 flex flex-col w-2/3 ml-[10px] justify-between"
@@ -29,8 +29,8 @@ const eventCardVariants = tv({
       "text-text-primary"
     ],
     blockButton: [
-      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-button text-[14px] font-normal cursor-pointer select-none shadow-card",
-      "bg-interactive hover:bg-interactive-hover text-white transition-colors"
+      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-full text-[14px] font-normal cursor-pointer select-none shadow-sm transition-all duration-200",
+      "bg-interactive hover:bg-interactive-hover text-white hover:shadow-md"
     ],
     blockedOverlay: [
       "absolute top-0 left-0 w-0 h-full rounded-card z-0 pointer-events-none transition-all duration-500",
