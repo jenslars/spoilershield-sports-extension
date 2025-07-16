@@ -8,7 +8,7 @@ const Popup: React.FC = () => {
   useTheme(); // Initialize theme detection
   
   return (
-    <div className="w-[330px] h-[400px] bg-surface text-text-primary">
+    <div className="w-[392px] h-[612px] bg-surface text-text-primary">
       <LandingPage />
     </div>
   );

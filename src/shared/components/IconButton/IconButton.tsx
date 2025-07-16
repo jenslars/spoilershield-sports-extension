@@ -13,7 +13,7 @@ const iconButton = tv({
     variant: {
       solid: "",
       DatePicker: "text-blue-500 hover:text-blue-400",
-      Header: "text-slate-100 hover:text-slate-50"
+      Header: "text-text-primary hover:text-text-secondary"
     },
     color: {
       primary: "text-slate-100 hover:text-slate-50",
@@ -23,6 +23,7 @@ const iconButton = tv({
       danger: "text-red-600 hover:text-red-700",
       info: "text-blue-600 hover:text-blue-700",
       blue: "text-blue-400 hover:text-blue-500",
+      theme: "text-text-primary hover:text-text-secondary"
     }
   },
   compoundVariants: [
@@ -37,11 +38,11 @@ const iconButton = tv({
         color: "blue",
         class: "text-blue-400 hover:text-blue-500"
     },
-    // Header
+    // Header with theme colors
     {
         variant: "Header",
-        color: "primary",
-        class: "text-slate-100 hover:text-slate-50"
+        color: "theme",
+        class: "text-text-primary hover:text-text-secondary"
     }
   ],
   defaultVariants: {
@@ -52,7 +53,7 @@ const iconButton = tv({
 });
 
 const iconSizes = tv({
-  base: "transition-colors duration-200 fill-current stroke-current",
+  base: "transition-colors duration-200", // Removed fill-current stroke-current
   variants: {
     size: {
       sm: "w-6 h-6",
@@ -76,6 +77,7 @@ export interface IconButtonProps
     light?: string;
     dark?: string;
   };
+  useThemeFill?: boolean; // New prop to control theme-based fill
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
@@ -86,6 +88,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   label,
   loading = false,
   customColors,
+  useThemeFill = false, // Default to false to maintain backward compatibility
   className,
   disabled,
   onClick,
@@ -94,6 +97,25 @@ const IconButton: React.FC<IconButtonProps> = ({
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (loading || disabled) return;
     onClick?.(event);
+  };
+
+  // Determine if this variant should use theme fill
+  const shouldUseThemeFill = useThemeFill || variant === "Header";
+
+  // Get the appropriate fill value
+  const getFillValue = () => {
+    if (customColors) {
+      // Use custom colors if provided
+      return `var(--color-${customColors.light || 'text-primary'})`;
+    }
+    
+    if (shouldUseThemeFill) {
+      // Use theme-based fill
+      return "var(--color-text-primary)";
+    }
+    
+    // Default to currentColor for other variants
+    return "currentColor";
   };
 
   return (
@@ -117,7 +139,10 @@ const IconButton: React.FC<IconButtonProps> = ({
           />
         </svg>
       ) : (
-        <Icon className={iconSizes({ size })} />
+        <Icon 
+          className={iconSizes({ size })} 
+          fill={getFillValue()}
+        />
       )}
     </button>
   );

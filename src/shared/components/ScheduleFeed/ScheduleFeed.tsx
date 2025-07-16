@@ -22,7 +22,7 @@ const ScheduleFeed: React.FC<ScheduleFeedProps> = ({ schedule }) => {
   };
 
   return (
-    <div className="flex flex-col w-[95%] mx-auto">
+    <div className="flex flex-col w-[95%] mx-auto mt-2">
       {schedule.response.map((game, index) => {
         const isBlocked = isEventBlocked(game.id);
         return (

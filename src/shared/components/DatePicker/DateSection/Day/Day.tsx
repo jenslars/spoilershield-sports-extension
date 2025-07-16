@@ -6,7 +6,7 @@ const dayContainer = tv({
 });
 
 const weekdayBackground = tv({
-  base: "w-7 h-7 rounded-full flex items-center justify-center",
+  base: "w-[32px] h-[32px] rounded-full flex items-center justify-center",
   variants: {
     isToday: {
       true: "",
@@ -32,11 +32,11 @@ const weekdayBackground = tv({
 });
 
 const weekday = tv({
-  base: "text-gray-500 text-xs mt-0.5 font-bold mb-1"
+  base: "text-gray-500 text-sm mt-0.5 font-bold mb-1"
 });
 
 const dateNumber = tv({
-  base: "font-normal text-sm",
+  base: "font-medium text-xl",
   variants: {
     isToday: {
       true: "",

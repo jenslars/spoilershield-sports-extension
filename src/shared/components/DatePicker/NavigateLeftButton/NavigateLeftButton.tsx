@@ -11,7 +11,7 @@ const NavigateLeftButton: React.FC<NavigateLeftButtonProps> = ({ onClick }) => (
     icon={ChevronBackward}
     onClick={onClick}
     label="Previous Week"
-    size="md"
+    size="lg"
     variant="DatePicker"
     color="blue"
   />

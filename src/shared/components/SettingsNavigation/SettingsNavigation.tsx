@@ -95,8 +95,8 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
       onClick={onClick}
     >
       <div className="flex items-center space-x-2">
-        <Icon className="w-5 h-5 text-text-primary" />
-        <span className="text-white text-text-primary font-light text-sm">{label}</span>
+        <Icon className="w-5 h-5" fill="var(--color-text-primary)" />
+        <span className="text-text-primary font-light text-sm">{label}</span>
       </div>
       <div className="flex items-center">
         {showSwitch ? (
@@ -106,7 +106,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           />
         ) : showChevron ? (
-          <ChevronForwardIcon className="w-7 h-7 text-text-primary" />
+          <ChevronForwardIcon className="w-7 h-7 text-text-primary" fill="var(--color-text-primary)" />
         ) : null}
       </div>
     </div>
@@ -127,7 +127,7 @@ const SettingsNavigation = () => {
       {/* Settings Content */}
       <div className="w-[90%] mx-auto">
         {/* General Section */}
-        <div className="mb-8">
+        <div className="mb-4">
           <h2 className="text-lg font-medium text-text-primary mb-4">General</h2>
           <div>
             <SettingsItem
@@ -155,7 +155,7 @@ const SettingsNavigation = () => {
 
         {/* Support Section */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4 px-2">Support</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Support</h2>
           <div>
             <SettingsItem
               icon={ContactIcon}

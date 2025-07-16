@@ -27,15 +27,15 @@ const eventCardVariants = tv({
       "text-text-primary"
     ],
     blockButton: [
-      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-full text-[14px] font-normal cursor-pointer select-none shadow-sm transition-all duration-300",
-      "bg-interactive hover:bg-interactive-hover text-white hover:shadow-lg"
+      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-full text-[14px] font-normal cursor-pointer text-text-primary select-none shadow-sm transition-all duration-300",
+      "bg-interactive hover:bg-interactive-hover hover:shadow-lg"
     ],
     blockedOverlay: [
       "absolute top-0 left-0 w-0 h-full rounded-card z-0 pointer-events-none transition-all duration-500",
       "bg-surface-overlay"
     ],
     buttonOverlay: [
-      "absolute top-0 left-0 w-0 h-full rounded-button flex items-center justify-center text-white text-[14px] font-normal z-[2] pointer-events-none transition-all duration-500",
+      "absolute top-0 left-0 w-0 h-full rounded-button flex items-center justify-center text-text-primary text-[14px] font-normal z-[2] pointer-events-none transition-all duration-500",
       "bg-interactive"
     ]
   },
@@ -188,7 +188,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, isBlocked, onBlockEvent, o
           <VisibilityOffIcon 
             width={14} 
             height={14} 
-            className="m-[2px_6px_0_8px] fill-white" 
+            className="m-[2px_6px_0_8px]" 
+            fill="var(--color-text-primary)"
           />
           Block
         </div>

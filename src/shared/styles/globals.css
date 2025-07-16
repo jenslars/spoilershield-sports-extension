@@ -49,9 +49,10 @@
   }
 
   body {
-    @apply font-semibold m-0 p-0 flex;
+    @apply m-0 p-0 flex;
     background-color: var(--color-background);
     font-family: var(--font-family-inter);
+    transition: background-color 0.3s cubic-bezier(0.4,0,0.2,1), color 0.3s cubic-bezier(0.4,0,0.2,1);
   }
 }
 
@@ -94,4 +95,20 @@
 
 .text-icon-button {
   color: var(--color-icon-button);
+}
+
+.bg-surface,
+.bg-background,
+.bg-surface-overlay,
+.bg-interactive,
+.bg-interactive-hover,
+.bg-interactive-overlay {
+  transition: background-color 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.text-text-primary,
+.text-text-secondary,
+.text-text-tertiary,
+.text-icon-button {
+  transition: color 0.3s cubic-bezier(0.4,0,0.2,1);
 }

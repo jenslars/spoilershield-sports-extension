@@ -11,7 +11,7 @@ interface MonthYearLabelProps {
 
 const MonthYearLabel: React.FC<MonthYearLabelProps> = ({ monthYear }) => {
   return (
-    <div className="text-xl w-[60%] text-center font-medium uppercase">
+    <div className="text-xl w-[60%] text-center font-semibold uppercase">
       {monthYear.month} {monthYear.year}
     </div>
   );

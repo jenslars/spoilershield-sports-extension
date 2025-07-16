@@ -8,7 +8,7 @@ const LandingPage: React.FC = () => {
   const { monthYear, schedule, handleDateChange } = useSchedule();
 
   return (
-    <div className="w-[330px] h-[400px] bg-background text-text-primary">
+    <div className="h-full bg-background text-text-primary">
       <HeaderSection monthYear={monthYear} />
       <DatePicker onDateChange={handleDateChange} />
       <ScheduleFeed schedule={schedule} />

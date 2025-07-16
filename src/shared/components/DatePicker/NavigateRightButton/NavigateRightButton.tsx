@@ -11,7 +11,7 @@ const NavigateRightButton: React.FC<NavigateRightButtonProps> = ({ onClick }) =>
     icon={ChevronForward}
     onClick={onClick}
     label="Next Week"
-    size="md"
+    size="lg"
     variant="DatePicker"
     color="blue"
   />
