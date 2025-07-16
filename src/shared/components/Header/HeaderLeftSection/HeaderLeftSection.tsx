@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import IconButton from '../../IconButton/IconButton';
 import ListCheckedIcon from '../../../../assets/icons/svg/ListCheckedIcon.svg';
-import SlidingPanel from '../../SlidingPanel';
+import SlidingPanel from '../../SlidingPanel/SlidingPanel';
+import BlockedEventsList from '../../BlockedEventsList/BlockedEventsList';
 
 const HeaderLeftSection: React.FC = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -29,12 +30,9 @@ const HeaderLeftSection: React.FC = () => {
         direction="left" 
         isOpen={isOverlayVisible}
         onClose={handleOverlayClose}
+        label="Blocked Events"
       >
-        <div>
-          <h2>Blocked Events</h2>
-          <p>This is the content that will slide in from the left.</p>
-          <button onClick={handleOverlayClose}>Close</button>
-        </div>
+        <BlockedEventsList />
       </SlidingPanel>
     </>
   );

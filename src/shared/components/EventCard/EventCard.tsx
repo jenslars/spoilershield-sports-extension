@@ -89,7 +89,7 @@ interface MultiCompetitorEvent {
   eventDetails: EventDetails;
 }
 
-type Event = HeadToHeadEvent | MultiCompetitorEvent;
+export type Event = HeadToHeadEvent | MultiCompetitorEvent;
 
 interface EventCardProps {
   event: Event;
