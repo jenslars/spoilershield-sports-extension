@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-
-function PickerWithButtonField() {
+const PickerWithButtonField: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -15,6 +14,6 @@ function PickerWithButtonField() {
   return (
     <div></div>
   );
-}
+};
 
-export default PickerWithButtonField;
+export default PickerWithButtonField; 

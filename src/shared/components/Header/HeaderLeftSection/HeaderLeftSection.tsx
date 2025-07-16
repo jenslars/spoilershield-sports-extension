@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import HeaderSectionButton from '../HeaderSectionButtons/HeaderSectionButton';
-import { StyledHeaderLeftSection } from './styles';
+import IconButton from '../../IconButton/IconButton';
 import ListCheckedIcon from '../../../../assets/icons/svg/ListCheckedIcon.svg';
 import SlidingPanel from '../../SlidingPanel';
 
-const HeaderLeftSection = () => {
+const HeaderLeftSection: React.FC = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
 
   // Handle closing the overlay
@@ -14,13 +13,16 @@ const HeaderLeftSection = () => {
 
   return (
     <>
-      <StyledHeaderLeftSection>
+      <div className="w-[15%] flex justify-around">
         {/* Button to open the overlay */}
-        <HeaderSectionButton 
-          IconComponent={ListCheckedIcon} 
-          onClick={() => setOverlayVisible(true)} 
+        <IconButton
+          icon={ListCheckedIcon}
+          onClick={() => setOverlayVisible(true)}
+          label="Show Blocked Events"
+          size="sm"
+          variant="Header"
         />
-      </StyledHeaderLeftSection>
+      </div>
       
       {/* Sliding Panel */}
       <SlidingPanel 
@@ -38,4 +40,4 @@ const HeaderLeftSection = () => {
   );
 };
 
-export default HeaderLeftSection;
+export default HeaderLeftSection; 

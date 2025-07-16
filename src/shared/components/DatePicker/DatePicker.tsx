@@ -79,7 +79,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
   };
 
   return (
-    <div className="w-[92%] flex flex-row justify-around items-center mx-auto mt-[10px]">
+    <div className="flex flex-row justify-around items-center mx-auto mt-[10px]">
       <NavigateLeftButton onClick={handlePrevWeek} />
       <DateSection 
         currentWeek={currentWeek} 

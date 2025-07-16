@@ -2,8 +2,6 @@ import React from "react";
 import { tv } from 'tailwind-variants';
 import HeadToHeadSection from "./HeadToHeadSection/HeadToHeadSection";
 import MultiCompetitorSection from "./MultiCompetitorSection/MultiCompetitorSection";
-import { fetchPlayerData } from "../../utils/api/nba_schedule_api";
-import { saveGameData } from "../../utils/localStorage/saveSpoilerData";
 import VisibilityOffIcon from "../../../assets/icons/svg/VisibilityOffIcon.svg"
 import { useSpoilerData } from '../../hooks/useSpoilerData';
 
@@ -29,8 +27,8 @@ const eventCardVariants = tv({
       "text-text-primary"
     ],
     blockButton: [
-      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-full text-[14px] font-normal cursor-pointer select-none shadow-sm transition-all duration-200",
-      "bg-interactive hover:bg-interactive-hover text-white hover:shadow-md"
+      "relative overflow-hidden h-[25px] w-[75px] flex items-center rounded-full text-[14px] font-normal cursor-pointer select-none shadow-sm transition-all duration-300",
+      "bg-interactive hover:bg-interactive-hover text-white hover:shadow-lg"
     ],
     blockedOverlay: [
       "absolute top-0 left-0 w-0 h-full rounded-card z-0 pointer-events-none transition-all duration-500",
@@ -166,9 +164,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, isBlocked, onBlockEvent, o
               title={event.eventTitle}
               image={event.eventImage}
               description={event.eventDescription}
-              venue={event.eventDetails?.eventDetailVenue || ''}
-              type={event.eventDetails?.eventDetailType || ''}
-              value={event.eventDetails?.eventDetailValue || ''}
             />
           )}
         </div>
