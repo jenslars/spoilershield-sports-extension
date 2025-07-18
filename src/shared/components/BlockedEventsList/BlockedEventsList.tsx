@@ -26,9 +26,9 @@ const BlockedEventsList: React.FC = () => {
   }
 
   return (
-    <div className="p-4 bg-gray-100 rounded-lg my-4">
-      <h3 className="mb-4 text-lg font-semibold text-gray-800">
-        Blocked Events ({blockedEvents.length})
+    <div>
+      <h3 className="mb-4 text-lg font-medium text-text-primary">
+        Currently Blocked Events
       </h3>
       {blockedEvents.map((event, index) => {
         const isBlocked = isEventBlocked(event.id);

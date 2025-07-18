@@ -1,7 +1,8 @@
 import React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import IconButton from '../IconButton/IconButton';
-import ReturnIcon from '../../../assets/icons/svg/ReturnIcon.svg';
+import ArrowRightIcon from '../../../assets/icons/svg/ArrowRightIcon.svg';
+import ArrowLeftIcon from '../../../assets/icons/svg/ArrowLeftIcon.svg';
 
 const slidingPanel = tv({
   base: "fixed top-0 h-screen w-full z-50 transition-transform duration-300 ease-in-out",
@@ -59,21 +60,21 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
   return (
     <div className={slidingPanel({ direction, isOpen, className })} {...props}>
       {onClose && (
-        <div className="bg-background h-[23%] flex flex-col justify-end relative">
+        <div className="bg-background h-[21%] flex flex-col justify-end relative">
             <IconButton
-                icon={ReturnIcon}
+                icon={direction === 'left' ? ArrowLeftIcon : ArrowRightIcon}
                 onClick={onClose}
                 label="Close panel"
-                size="md"
+                size="lg"
                 variant="Header"
                 className={`absolute top-4 z-10 ${direction === 'left' ? 'left-2' : 'right-2'}`}
             />
-            <h1 className="text-2xl font-semibold mb-2 ml-7">
+            <h1 className="text-4xl font-medium mb-4 ml-7">
                 {label}
             </h1> 
         </div>
       )} 
-        <div className="bg-surface h-full">
+        <div className="bg-surface h-[79%]">
             <div className={panelContent()}>
                 {children}
             </div>

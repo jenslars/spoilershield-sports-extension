@@ -5,6 +5,18 @@ import MultiCompetitorSection from "./MultiCompetitorSection/MultiCompetitorSect
 import VisibilityOffIcon from "../../../assets/icons/svg/VisibilityOffIcon.svg"
 import { useSpoilerData } from '../../hooks/useSpoilerData';
 
+// Function to determine if a competition image should be filtered in dark mode
+const getCompetitionImageFilter = (sport: string, isDarkMode: boolean) => {
+  // Define which sports should have their logos filtered to white in dark mode
+  const sportsThatNeedFiltering = ['F1', 'UFC', 'Premier League', 'Champions League', 'Olympics'];
+  
+  if (isDarkMode && sportsThatNeedFiltering.includes(sport)) {
+    return 'brightness(0) invert(1)'; // Make logo white in dark mode
+  }
+  
+  return ''; // No filter
+};
+
 // Define component variants using tailwind-variants
 const eventCardVariants = tv({
   slots: {
@@ -109,6 +121,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, isBlocked, onBlockEvent, o
   });
   const startDate = new Date(event.date.start).toLocaleDateString();
 
+  // Check if dark mode is active
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  const competitionImageFilter = getCompetitionImageFilter(event.sport, isDarkMode);
+
   // Handle block button click
   const handleBlockClick = async () => {
     if (isBlocked) {
@@ -151,7 +167,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, isBlocked, onBlockEvent, o
             <img 
               src={event.competitionImage} 
               alt={event.sport} 
-              className="h-[17px] w-auto" 
+              className="h-[17px] w-auto transition-all duration-300" 
+              style={{ filter: competitionImageFilter }}
             />
           )}
         </div>

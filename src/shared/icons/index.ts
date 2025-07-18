@@ -4,9 +4,10 @@ export { default as VisibilityOff } from '../../assets/icons/svg/VisibilityOffIc
 export { default as DisabledVisible } from '../../assets/icons/svg/DisabledVisibleIcon.svg';
 export { default as Settings } from '../../assets/icons/svg/SettingsIcon.svg';
 export { default as Menu } from '../../assets/icons/svg/MenuIcon.svg';
-export { default as Return } from '../../assets/icons/svg/ReturnIcon.svg';
 export { default as Calendar } from '../../assets/icons/svg/CalendarIcon.svg';
 export { default as Close } from '../../assets/icons/svg/CloseIcon.svg';
 export { default as Delete } from '../../assets/icons/svg/DeleteIcon.svg';
 export { default as ChevronForward } from '../../assets/icons/svg/ChevronForwardIcon.svg';
 export { default as ChevronBackward } from '../../assets/icons/svg/ChevronBackwardIcon.svg';
+export { default as ArrowRight } from '../../assets/icons/svg/ArrowRightIcon.svg';
+export { default as ArrowLeft } from '../../assets/icons/svg/ArrowLeftIcon.svg';

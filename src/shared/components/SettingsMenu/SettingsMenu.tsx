@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Switch, SwitchProps } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import ThemeIcon from '../../../assets/icons/svg/label-icons/ThemeIcon.svg';
 import FeedIcon from '../../../assets/icons/svg/label-icons/FeedIcon.svg';
 import BlockPreferencesIcon from '../../../assets/icons/svg/label-icons/BlockPreferencesIcon.svg';
@@ -8,67 +6,12 @@ import ListCheckedIcon from '../../../assets/icons/svg/label-icons/ListCheckedIc
 import ContactIcon from '../../../assets/icons/svg/label-icons/ContactIcon.svg';
 import FAQIcon from '../../../assets/icons/svg/label-icons/FAQIcon.svg';
 import ChevronForwardIcon from '../../../assets/icons/svg/label-icons/ChevronForwardIcon.svg';
-
-// Custom styled MUI Switch for iOS style
-const IOSSwitch = styled((props: SwitchProps) => (
-  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-))(({ theme }) => ({
-  width: 42,
-  height: 26,
-  padding: 0,
-  '& .MuiSwitch-switchBase': {
-    padding: 0,
-    margin: 2,
-    transitionDuration: '300ms',
-    '&.Mui-checked': {
-      transform: 'translateX(16px)',
-      color: '#fff',
-      '& + .MuiSwitch-track': {
-        backgroundColor: '#60a5fa', // blue-400
-        opacity: 1,
-        border: 0,
-        ...theme.applyStyles('dark', {
-          backgroundColor: '#3b82f6', // blue-500 for dark mode
-        }),
-      },
-      '&.Mui-disabled + .MuiSwitch-track': {
-        opacity: 0.5,
-      },
-    },
-    '&.Mui-focusVisible .MuiSwitch-thumb': {
-      color: '#3b82f6', // blue-500
-      border: '6px solid #fff',
-    },
-    '&.Mui-disabled .MuiSwitch-thumb': {
-      color: theme.palette.grey[100],
-      ...theme.applyStyles('dark', {
-        color: theme.palette.grey[600],
-      }),
-    },
-    '&.Mui-disabled + .MuiSwitch-track': {
-      opacity: 0.7,
-      ...theme.applyStyles('dark', {
-        opacity: 0.3,
-      }),
-    },
-  },
-  '& .MuiSwitch-thumb': {
-    boxSizing: 'border-box',
-    width: 22,
-    height: 22,
-  },
-  '& .MuiSwitch-track': {
-    borderRadius: 26 / 2,
-    backgroundColor: '#E9E9EA',
-    opacity: 1,
-    transition: theme.transitions.create(['background-color'], {
-      duration: 500,
-    }),
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#39393D',
-    }),
-  },
-}));
+import SwitchButton from '../MUI-components/SwitchButton';
+import SlidingPanel from '../SlidingPanel/SlidingPanel';
+import FeedPreferences from './FeedPreferences/FeedPreferences';
+import BlockedEventsList from '../BlockedEventsList/BlockedEventsList';
+import ReportIssue from './ReportIssue/ReportIssue';
+import BlockPreferences from './BlockPreferences/BlockPreferences';
 
 interface SettingsItemProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -91,35 +34,63 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
 }) => {
   return (
     <div 
-      className="flex items-center justify-between cursor-pointer border-b border-gray-700 py-2"
+      className="flex items-center justify-between cursor-pointer border-b border-gray-700 py-3"
       onClick={onClick}
     >
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <Icon className="w-5 h-5" fill="var(--color-text-primary)" />
         <span className="text-text-primary font-light text-sm">{label}</span>
       </div>
       <div className="flex items-center">
         {showSwitch ? (
-          <IOSSwitch
-            checked={switchChecked}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSwitchChange?.(e.target.checked)}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-          />
+          <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <SwitchButton
+              checked={switchChecked}
+              onChange={onSwitchChange || (() => {})}
+            />
+          </div>
         ) : showChevron ? (
-          <ChevronForwardIcon className="w-7 h-7 text-text-primary" fill="var(--color-text-primary)" />
+          <ChevronForwardIcon className="w-8 h-8 text-text-primary" fill="var(--color-text-primary)" />
         ) : null}
       </div>
     </div>
   );
 };
 
-const SettingsNavigation = () => {
+const SettingsMenu = () => {
   const [darkMode, setDarkMode] = useState(true);
+  const [activePanel, setActivePanel] = useState<string | null>(null);
 
   const handleDarkModeToggle = (checked: boolean) => {
     setDarkMode(checked);
     // Here you would typically update the theme
     document.documentElement.classList.toggle('dark', checked);
+  };
+
+  const handleItemClick = (panelType: string) => {
+    setActivePanel(panelType);
+  };
+
+  const handleClosePanel = () => {
+    setActivePanel(null);
+  };
+
+  // Placeholder components for each panel
+  const renderPanelContent = (panelType: string) => {
+    switch (panelType) {
+      case 'feed-preferences':
+        return <FeedPreferences />;
+      case 'blocking-preferences':
+        return <BlockPreferences />;
+      case 'blocked-events':
+        return <BlockedEventsList />;
+      case 'report-issue':
+        return <ReportIssue />;
+      case 'faq':
+        return <div className="p-4">FAQ Panel - Build your component here</div>;
+      default:
+        return <div className="p-4">Panel content not found</div>;
+    }
   };
 
   return (
@@ -128,7 +99,7 @@ const SettingsNavigation = () => {
       <div className="w-[90%] mx-auto">
         {/* General Section */}
         <div className="mb-4">
-          <h2 className="text-lg font-medium text-text-primary mb-4">General</h2>
+          <h2 className="text-2xl font-regular text-text-primary mb-2">General</h2>
           <div>
             <SettingsItem
               icon={ThemeIcon}
@@ -140,36 +111,51 @@ const SettingsNavigation = () => {
             />
             <SettingsItem
               icon={FeedIcon}
-              label="Schedule Feed Preferences"
+              label="Feed Preferences"
+              onClick={() => handleItemClick('feed-preferences')}
             />
             <SettingsItem
               icon={BlockPreferencesIcon}
               label="Blocking Preferences"
+              onClick={() => handleItemClick('blocking-preferences')}
             />
             <SettingsItem
               icon={ListCheckedIcon}
               label="Blocked Events"
+              onClick={() => handleItemClick('blocked-events')}
             />
           </div>
         </div>
 
         {/* Support Section */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Support</h2>
+          <h2 className="text-2xl font-regular text-text-primary mb-2">Support</h2>
           <div>
             <SettingsItem
               icon={ContactIcon}
               label="Report an Issue"
+              onClick={() => handleItemClick('report-issue')}
             />
             <SettingsItem
               icon={FAQIcon}
               label="FAQ"
+              onClick={() => handleItemClick('faq')}
             />
           </div>
         </div>
       </div>
+
+      {/* Sliding Panels */}
+      <SlidingPanel
+        direction="left"
+        isOpen={!!activePanel}
+        onClose={handleClosePanel}
+        label={activePanel ? activePanel.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : ''}
+      >
+        {activePanel ? renderPanelContent(activePanel) : null}
+      </SlidingPanel>
     </>
   );
 };
 
-export default SettingsNavigation;
+export default SettingsMenu;

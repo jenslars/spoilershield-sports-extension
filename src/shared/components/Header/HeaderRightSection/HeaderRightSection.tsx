@@ -3,7 +3,7 @@ import IconButton from '../../IconButton/IconButton';
 import CalendarIcon from '../../../../assets/icons/svg/CalendarIcon.svg';
 import OptionsVertIcon from '../../../../assets/icons/svg/OptionsVertIcon.svg';
 import SlidingPanel from '../../SlidingPanel/SlidingPanel';
-import SettingsNavigation from '../../SettingsNavigation/SettingsNavigation';
+import SettingsMenu from '../../SettingsMenu/SettingsMenu';
 
 const HeaderRightSection: React.FC = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -38,12 +38,12 @@ const HeaderRightSection: React.FC = () => {
 
       {/* Sliding Panel - Settings */}
       <SlidingPanel 
-        direction="right" 
+        direction="left" 
         isOpen={isOverlayVisible}
         onClose={handleOverlayClose}
         label="Settings"
       >
-          <SettingsNavigation />
+          <SettingsMenu />
       </SlidingPanel>
     </>
   );
