@@ -6,12 +6,12 @@ export const useSpoilerData = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSpoilerData = async (eventId: string): Promise<SpoilersResponse | null> => {
+  const fetchSpoilerData = async (eventId: string, apiKey: string): Promise<SpoilersResponse | null> => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const response = await spoilerShieldService.getSpoilers({ eventId });
+      const response = await spoilerShieldService.getSpoilers({ eventId, apiKey });
       return response;
     } catch (err: any) {
       setError(err.message);

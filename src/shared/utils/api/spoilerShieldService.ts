@@ -13,16 +13,19 @@ export class SpoilerShieldService {
   /**
    * Retrieve schedule for specified sports and date
    */
-  async getSchedule(request: ScheduleRequest): Promise<ScheduleResponse> {
+  async getSchedule(request: ScheduleRequest & { timezone: string; competitionIds: string[]; apiKey: string }): Promise<ScheduleResponse> {
+    // GET to /schedule/:date?timezone=...&competitionIds=...
+    // Pass apiKey and apiVersion as required by the get method signature
     const response = await spoilerShieldApiClient.get<ScheduleResponse>(
-      '/schedule',
+      `/schedule/${request.date}`,
       {
         params: {
-          sports: request.sports.join(','),
-          date: request.date
+          timezone: request.timezone,
+          competitionIds: request.competitionIds.join(',') // Always send as comma-separated string
         }
       },
-      true // Use cache for schedule data
+      request.apiKey,
+      '1.0.0'
     );
 
     if (!response.success) {
@@ -35,10 +38,12 @@ export class SpoilerShieldService {
   /**
    * Retrieve competitions for all sports
    */
-  async getCompetitions(): Promise<CompetitionsResponse> {
+  async getCompetitions(apiKey: string): Promise<CompetitionsResponse> {
     const response = await spoilerShieldApiClient.get<CompetitionsResponse>(
       '/competitions',
-      undefined,
+      {},
+      apiKey,
+      '1.0.0',
       true // Cache competitions as they don't change frequently
     );
 
@@ -52,10 +57,12 @@ export class SpoilerShieldService {
   /**
    * Retrieve spoilers for a specific event
    */
-  async getSpoilers(request: SpoilerRequest): Promise<SpoilersResponse> {
+  async getSpoilers(request: SpoilerRequest & { apiKey: string }): Promise<SpoilersResponse> {
     const response = await spoilerShieldApiClient.get<SpoilersResponse>(
       `/spoilers/${request.eventId}`,
-      undefined,
+      {},
+      request.apiKey,
+      '1.0.0',
       false // Don't cache spoilers as they change frequently
     );
 
@@ -77,7 +84,7 @@ export class SpoilerShieldService {
   /**
    * Report an issue with optional file attachment
    */
-  async reportIssue(request: ReportIssueRequest): Promise<ReportIssueResponse> {
+  async reportIssue(request: ReportIssueRequest & { apiKey: string }): Promise<ReportIssueResponse> {
     if (!request.description || request.description.trim() === '') {
       throw new Error('Description is required');
     }
@@ -94,7 +101,10 @@ export class SpoilerShieldService {
 
       const response = await spoilerShieldApiClient.postFormData<ReportIssueResponse>(
         '/report-issue',
-        formData
+        formData,
+        {},
+        request.apiKey,
+        '1.0.0'
       );
 
       if (!response.success) {
@@ -111,7 +121,10 @@ export class SpoilerShieldService {
           device: request.device,
           browser: request.browser,
           website: request.website
-        }
+        },
+        {},
+        request.apiKey,
+        '1.0.0'
       );
 
       if (!response.success) {
@@ -130,36 +143,42 @@ export class SpoilerShieldService {
   }
 
   /**
-   * Get rate limit status for an endpoint
+   * Register a device and get an API key
    */
-  getRateLimitStatus(endpoint: string): { count: number; limit: number; resetTime: number } | null {
-    return spoilerShieldApiClient.getRateLimitStatus(endpoint);
+  async registerDevice(fingerprint: any): Promise<{ apiKey: string }> {
+    const response = await spoilerShieldApiClient.post<{ apiKey: string }>(
+      '/auth/register-device',
+      { fingerprint },
+      {},
+      '', // No API key required for registration
+      '1.0.0'
+    );
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to register device');
+    }
+    return response.data!;
   }
 
   /**
-   * Check if rate limit is exceeded for an endpoint
+   * Validate an API key with fingerprint
    */
-  isRateLimitExceeded(endpoint: string): boolean {
-    const status = this.getRateLimitStatus(endpoint);
-    if (!status) return false;
-    
-    const now = Date.now();
-    if (now > status.resetTime) return false;
-    
-    return status.count >= status.limit;
-  }
-
-  /**
-   * Get time until rate limit resets (in seconds)
-   */
-  getTimeUntilReset(endpoint: string): number {
-    const status = this.getRateLimitStatus(endpoint);
-    if (!status) return 0;
-    
-    const now = Date.now();
-    const timeUntilReset = Math.max(0, status.resetTime - now);
-    
-    return Math.ceil(timeUntilReset / 1000); // Convert to seconds
+  async validateApiKey(apiKey: string, fingerprint: any): Promise<{ valid: boolean }> {
+    const params = {
+      apiKey,
+      fingerprint: JSON.stringify(fingerprint)
+    };
+    // Use GET with params
+    const response = await spoilerShieldApiClient.get<{ valid: boolean }>(
+      '/auth/validate',
+      { params },
+      '', // No API key required for validation
+      '1.0.0',
+      false
+    );
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to validate API key');
+    }
+    return response.data!;
   }
 }
 

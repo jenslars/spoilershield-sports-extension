@@ -18,7 +18,6 @@ export interface RateLimitInfo {
 // Authentication types
 export interface ApiKey {
   key: string;
-  deviceId: string;
   createdAt: number;
   lastUsed: number;
   version: string;

@@ -27,30 +27,15 @@ export function generateDeviceFingerprint(): DeviceFingerprint {
 }
 
 /**
- * Generates a device ID from fingerprint
- */
-export async function generateDeviceId(fingerprint: DeviceFingerprint): Promise<string> {
-  const fingerprintString = JSON.stringify(fingerprint);
-  const encoder = new TextEncoder();
-  const data = encoder.encode(fingerprintString);
-  
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hash));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
-}
-
-/**
  * Creates a new API key for the device
  */
 export async function createApiKey(): Promise<ApiKey> {
   const fingerprint = generateDeviceFingerprint();
-  const deviceId = await generateDeviceId(fingerprint);
   const key = generateApiKey();
   const now = Date.now();
 
   return {
     key,
-    deviceId,
     createdAt: now,
     lastUsed: now,
     version: EXTENSION_VERSION
@@ -70,6 +55,93 @@ export async function signRequest(url: string, method: string, timestamp: number
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+const API_BASE = '/auth';
+
+async function registerDeviceWithServer(fingerprint: string): Promise<{ apiKey: string }> {
+  const res = await fetch(`${API_BASE}/register-device`, {
+    method: 'POST',
+    body: JSON.stringify({ fingerprint }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw new Error('Failed to register device');
+  return res.json();
+}
+
+async function rotateKeyWithServer(apiKey: string, fingerprint: string): Promise<{ apiKey: string }> {
+  const res = await fetch(`${API_BASE}/rotate-key`, {
+    method: 'POST',
+    body: JSON.stringify({ apiKey, fingerprint }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw new Error('Failed to rotate key');
+  return res.json();
+}
+
+async function validateKeyWithServer(apiKey: string, fingerprint: string): Promise<{ valid: boolean }> {
+  const params = new URLSearchParams({ apiKey, fingerprint });
+  const res = await fetch(`${API_BASE}/validate?${params.toString()}`);
+  if (!res.ok) throw new Error('Failed to validate key');
+  return res.json();
+}
+
+/**
+ * Helper functions for storage abstraction (chrome.storage.local or localStorage)
+ */
+function isChromeStorageAvailable() {
+  return typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local;
+}
+
+function setStorageItem(key: string, value: any): Promise<void> {
+  if (isChromeStorageAvailable()) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set({ [key]: value }, function () {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  } else {
+    localStorage.setItem(key, JSON.stringify(value));
+    return Promise.resolve();
+  }
+}
+
+function getStorageItem<T>(key: string): Promise<T | null> {
+  if (isChromeStorageAvailable()) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([key], function (result) {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(result[key] ?? null);
+        }
+      });
+    });
+  } else {
+    const stored = localStorage.getItem(key);
+    return Promise.resolve(stored ? JSON.parse(stored) : null);
+  }
+}
+
+function removeStorageItem(key: string): Promise<void> {
+  if (isChromeStorageAvailable()) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.remove([key], function () {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  } else {
+    localStorage.removeItem(key);
+    return Promise.resolve();
+  }
+}
+
 /**
  * Manages API key storage and retrieval
  */
@@ -83,18 +155,33 @@ export class ApiKeyManager {
   static async getApiKey(): Promise<ApiKey> {
     try {
       const stored = await this.getStoredApiKey();
+      const fingerprint = generateDeviceFingerprint();
       
       if (stored && this.isKeyValid(stored)) {
-        // Update last used timestamp
-        stored.lastUsed = Date.now();
-        await this.storeApiKey(stored);
-        return stored;
+        // Validate with server
+        const valid = await validateKeyWithServer(stored.key, JSON.stringify(fingerprint));
+        if (valid.valid) {
+          // Update last used timestamp
+          stored.lastUsed = Date.now();
+          await this.storeApiKey(stored);
+          return stored;
+        } else {
+          // Key invalid, rotate
+          return await this.rotateApiKey();
+        }
       }
       
-      // Create new key if none exists or current one is expired
-      const newKey = await createApiKey();
-      await this.storeApiKey(newKey);
-      return newKey;
+      // Register new device
+      const reg = await registerDeviceWithServer(JSON.stringify(fingerprint));
+      const now = Date.now();
+      const apiKey: ApiKey = {
+        key: reg.apiKey,
+        createdAt: now,
+        lastUsed: now,
+        version: EXTENSION_VERSION
+      };
+      await this.storeApiKey(apiKey);
+      return apiKey;
     } catch (error) {
       console.error('Error getting API key:', error);
       throw new Error('Failed to get API key');
@@ -116,8 +203,7 @@ export class ApiKeyManager {
    * Stores the API key in browser storage
    */
   private static async storeApiKey(apiKey: ApiKey): Promise<void> {
-    // Use localStorage for now - can be enhanced with chrome.storage when needed
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(apiKey));
+    await setStorageItem(this.STORAGE_KEY, apiKey);
   }
 
   /**
@@ -125,8 +211,7 @@ export class ApiKeyManager {
    */
   private static async getStoredApiKey(): Promise<ApiKey | null> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
+      return await getStorageItem<ApiKey>(this.STORAGE_KEY);
     } catch (error) {
       console.error('Error retrieving stored API key:', error);
       return null;
@@ -138,7 +223,7 @@ export class ApiKeyManager {
    */
   static async clearApiKey(): Promise<void> {
     try {
-      localStorage.removeItem(this.STORAGE_KEY);
+      await removeStorageItem(this.STORAGE_KEY);
     } catch (error) {
       console.error('Error clearing API key:', error);
     }
@@ -148,7 +233,58 @@ export class ApiKeyManager {
    * Forces rotation of the API key
    */
   static async rotateApiKey(): Promise<ApiKey> {
-    await this.clearApiKey();
-    return await this.getApiKey();
+    const stored = await this.getStoredApiKey();
+    const fingerprint = generateDeviceFingerprint();
+    if (stored) {
+      const rotated = await rotateKeyWithServer(stored.key, JSON.stringify(fingerprint));
+      const now = Date.now();
+      const apiKey: ApiKey = {
+        key: rotated.apiKey,
+        createdAt: now,
+        lastUsed: now,
+        version: EXTENSION_VERSION
+      };
+      await this.storeApiKey(apiKey);
+      return apiKey;
+    } else {
+      // No key to rotate, register new
+      return await this.getApiKey();
+    }
   }
+} 
+
+/**
+ * Returns true if running in the background script context
+ */
+export function isBackgroundContext(): boolean {
+  if (typeof chrome === 'undefined' || !chrome.runtime) return false;
+  // Manifest V2: getBackgroundPage is a function
+  if (typeof chrome.runtime.getBackgroundPage === 'function') return true;
+  // Manifest V3: background property exists in manifest
+  try {
+    const manifest = chrome.runtime.getManifest && chrome.runtime.getManifest();
+    if (manifest && manifest.background) return true;
+  } catch (e) {}
+  return false;
+}
+
+/**
+ * For popup/content scripts: get API key from background script via messaging
+ */
+export async function getApiKeyFromBackground(): Promise<ApiKey> {
+  return new Promise((resolve, reject) => {
+    if (!chrome.runtime || !chrome.runtime.sendMessage) {
+      reject(new Error('chrome.runtime.sendMessage not available'));
+      return;
+    }
+    chrome.runtime.sendMessage({ type: 'GET_API_KEY' }, (response) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else if (response && response.success) {
+        resolve(response.data);
+      } else {
+        reject(new Error(response?.error || 'Failed to get API key from background'));
+      }
+    });
+  });
 } 

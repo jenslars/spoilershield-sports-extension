@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse, RateLimitInfo, ApiError, RateLimitError } from '../../types/api';
-import { ApiKeyManager, signRequest } from './deviceAuth';
+import { ApiKeyManager, signRequest, getApiKeyFromBackground, isBackgroundContext } from './deviceAuth';
+import { config } from '../../config/environment';
 
 // API configuration
 interface ApiConfig {
@@ -9,27 +10,10 @@ interface ApiConfig {
   headers: Record<string, string>;
 }
 
-// Rate limiting configuration
-interface RateLimitConfig {
-  schedule: { limit: number; window: number }; // requests per window (seconds)
-  spoilers: { limit: number; window: number };
-  competitions: { limit: number; window: number };
-  reportIssue: { limit: number; window: number };
-}
-
 class ApiClient {
   private client: AxiosInstance;
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-  private rateLimitCache: Map<string, { count: number; resetTime: number }> = new Map();
-
-  // Rate limiting configuration
-  private readonly rateLimits: RateLimitConfig = {
-    schedule: { limit: 100, window: 3600 }, // 100 requests per hour
-    spoilers: { limit: 500, window: 3600 }, // 500 requests per hour
-    competitions: { limit: 50, window: 3600 }, // 50 requests per hour
-    reportIssue: { limit: 10, window: 86400 } // 10 requests per day
-  };
 
   constructor(config: ApiConfig) {
     this.client = axios.create(config);
@@ -41,30 +25,23 @@ class ApiClient {
     this.client.interceptors.request.use(
       async (config) => {
         console.log(`SpoilerShield API Request: ${config.method?.toUpperCase()} ${config.url}`);
-        
         // Add authentication headers
-        await this.addAuthHeaders(config);
-        
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // Response interceptor for error handling and rate limit tracking
+    // Response interceptor for error handling
     this.client.interceptors.response.use(
-      (response) => {
-        // Track rate limit info from response headers
-        this.updateRateLimitInfo(response);
-        return response;
-      },
+      (response) => response,
       (error) => {
         console.error('SpoilerShield API Error:', error.response?.data || error.message);
-        
-        // Handle rate limit errors
+        // Handle rate limit errors gracefully
         if (error.response?.status === 429) {
-          this.handleRateLimitError(error);
+          const retryAfter = error.response?.headers['retry-after'];
+          // Optionally, you can add logic here to notify the user or handle retry
+          console.warn('Rate limit exceeded. Retry after:', retryAfter);
         }
-        
         return Promise.reject(error);
       }
     );
@@ -73,99 +50,31 @@ class ApiClient {
   /**
    * Adds authentication headers to the request
    */
-  private async addAuthHeaders(config: AxiosRequestConfig): Promise<void> {
+  private async addAuthHeaders(config: AxiosRequestConfig, apiKey: string, apiVersion: string = '1.0.0'): Promise<void> {
     try {
-      const apiKey = await ApiKeyManager.getApiKey();
       const timestamp = Date.now();
-      const signature = await signRequest(config.url || '', config.method || 'GET', timestamp, apiKey.key);
-
+      // Retrieve API key and fingerprint from storage or context
+      let fingerprintHeader = undefined;
+      const stored = localStorage.getItem('spoilerShieldApiKey');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.fingerprint) {
+            fingerprintHeader = JSON.stringify(parsed.fingerprint);
+          }
+        } catch {}
+      }
       config.headers = {
         ...config.headers,
-        'X-API-Key': apiKey.key,
-        'X-Device-ID': apiKey.deviceId,
+        'X-API-Key': apiKey,
         'X-Timestamp': timestamp.toString(),
-        'X-Signature': signature,
-        'X-Extension-Version': apiKey.version
+        'X-Extension-Version': apiVersion,
+        ...(fingerprintHeader ? { 'X-Fingerprint': fingerprintHeader } : {})
       };
     } catch (error) {
       console.error('Error adding auth headers:', error);
       throw new Error('Authentication failed');
     }
-  }
-
-  /**
-   * Updates rate limit information from response headers
-   */
-  private updateRateLimitInfo(response: AxiosResponse): void {
-    const rateLimitHeaders = {
-      'X-RateLimit-Limit': response.headers['x-ratelimit-limit'],
-      'X-RateLimit-Remaining': response.headers['x-ratelimit-remaining'],
-      'X-RateLimit-Reset': response.headers['x-ratelimit-reset']
-    };
-
-    if (rateLimitHeaders['X-RateLimit-Limit']) {
-      const endpoint = this.getEndpointFromUrl(response.config.url || '');
-      const rateLimitInfo: RateLimitInfo = {
-        limit: parseInt(rateLimitHeaders['X-RateLimit-Limit']),
-        remaining: parseInt(rateLimitHeaders['X-RateLimit-Remaining']),
-        reset: parseInt(rateLimitHeaders['X-RateLimit-Reset'])
-      };
-
-      // Store rate limit info for this endpoint
-      this.rateLimitCache.set(endpoint, {
-        count: rateLimitInfo.limit - rateLimitInfo.remaining,
-        resetTime: rateLimitInfo.reset * 1000 // Convert to milliseconds
-      });
-    }
-  }
-
-  /**
-   * Handles rate limit errors
-   */
-  private handleRateLimitError(error: any): void {
-    const retryAfter = error.response?.headers['retry-after'];
-    const rateLimitError: RateLimitError = {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Rate limit exceeded',
-      retryAfter: retryAfter ? parseInt(retryAfter) : 60
-    };
-    
-    console.warn('Rate limit exceeded:', rateLimitError);
-  }
-
-  /**
-   * Gets endpoint type from URL for rate limiting
-   */
-  private getEndpointFromUrl(url: string): string {
-    if (url.includes('/schedule')) return 'schedule';
-    if (url.includes('/spoilers')) return 'spoilers';
-    if (url.includes('/competitions')) return 'competitions';
-    if (url.includes('/report-issue')) return 'reportIssue';
-    return 'default';
-  }
-
-  /**
-   * Checks if rate limit would be exceeded for the endpoint
-   */
-  private checkRateLimit(endpoint: string): boolean {
-    const config = this.rateLimits[endpoint as keyof RateLimitConfig];
-    if (!config) return false;
-
-    const cacheKey = endpoint;
-    const cached = this.rateLimitCache.get(cacheKey);
-    
-    if (!cached) return false;
-
-    const now = Date.now();
-    
-    // Check if window has reset
-    if (now > cached.resetTime) {
-      this.rateLimitCache.delete(cacheKey);
-      return false;
-    }
-
-    // Check if limit would be exceeded
-    return cached.count >= config.limit;
   }
 
   private getCacheKey(url: string, params?: any): string {
@@ -177,36 +86,22 @@ class ApiClient {
   }
 
   /**
-   * Makes a GET request with authentication and rate limiting
+   * Makes a GET request with authentication
    */
-  async get<T>(url: string, config?: AxiosRequestConfig, useCache = true): Promise<ApiResponse<T>> {
-    const endpoint = this.getEndpointFromUrl(url);
-    
-    // Check rate limit
-    if (this.checkRateLimit(endpoint)) {
-      return {
-        success: false,
-        error: 'Rate limit exceeded',
-        status: 429
-      };
-    }
-
+  async get<T>(url: string, config: AxiosRequestConfig = {}, apiKey: string, apiVersion: string = '1.0.0', useCache = true): Promise<ApiResponse<T>> {
     const cacheKey = this.getCacheKey(url, config?.params);
-    
     if (useCache && this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey)!;
       if (this.isCacheValid(cached.timestamp)) {
         return { success: true, data: cached.data };
       }
     }
-
     try {
+      await this.addAuthHeaders(config, apiKey, apiVersion);
       const response: AxiosResponse<T> = await this.client.get(url, config);
-      
       if (useCache) {
         this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
       }
-      
       return { success: true, data: response.data };
     } catch (error: any) {
       return {
@@ -218,21 +113,11 @@ class ApiClient {
   }
 
   /**
-   * Makes a POST request with authentication and rate limiting
+   * Makes a POST request with authentication
    */
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const endpoint = this.getEndpointFromUrl(url);
-    
-    // Check rate limit
-    if (this.checkRateLimit(endpoint)) {
-      return {
-        success: false,
-        error: 'Rate limit exceeded',
-        status: 429
-      };
-    }
-
+  async post<T>(url: string, data: any = {}, config: AxiosRequestConfig = {}, apiKey: string, apiVersion: string = '1.0.0'): Promise<ApiResponse<T>> {
     try {
+      await this.addAuthHeaders(config, apiKey, apiVersion);
       const response: AxiosResponse<T> = await this.client.post(url, data, config);
       return { success: true, data: response.data };
     } catch (error: any) {
@@ -247,19 +132,9 @@ class ApiClient {
   /**
    * Makes a POST request with FormData for file uploads
    */
-  async postFormData<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const endpoint = this.getEndpointFromUrl(url);
-    
-    // Check rate limit
-    if (this.checkRateLimit(endpoint)) {
-      return {
-        success: false,
-        error: 'Rate limit exceeded',
-        status: 429
-      };
-    }
-
+  async postFormData<T>(url: string, formData: FormData, config: AxiosRequestConfig = {}, apiKey: string, apiVersion: string = '1.0.0'): Promise<ApiResponse<T>> {
     try {
+      await this.addAuthHeaders(config, apiKey, apiVersion);
       const response: AxiosResponse<T> = await this.client.post(url, formData, {
         ...config,
         headers: {
@@ -283,28 +158,11 @@ class ApiClient {
   clearCache(): void {
     this.cache.clear();
   }
-
-  /**
-   * Gets current rate limit status for an endpoint
-   */
-  getRateLimitStatus(endpoint: string): { count: number; limit: number; resetTime: number } | null {
-    const cached = this.rateLimitCache.get(endpoint);
-    if (!cached) return null;
-
-    const config = this.rateLimits[endpoint as keyof RateLimitConfig];
-    if (!config) return null;
-
-    return {
-      count: cached.count,
-      limit: config.limit,
-      resetTime: cached.resetTime
-    };
-  }
 }
 
 // Create SpoilerShield API client
 export const spoilerShieldApiClient = new ApiClient({
-  baseURL: process.env.REACT_APP_SPOILERSHIELD_API_URL || 'https://api.spoilershield.com',
+  baseURL: config.api.baseUrl,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'

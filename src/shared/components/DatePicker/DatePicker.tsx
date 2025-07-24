@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavigateLeftButton from './NavigateLeftButton/NavigateLeftButton';
 import NavigateRightButton from './NavigateRightButton/NavigateRightButton';
 import DateSection from './DateSection/DateSection';
-import { useSchedule } from '../../hooks/useSchedule';
 
 interface DatePickerProps {
-  onDateChange?: (date: Date) => void;
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
-  const { date, monthYear, handleDateChange } = useSchedule();
-
+const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateChange }) => {
   // Helper function to generate a range of dates
   const generateDateRange = (startDate: Date, days: number): Date[] => {
     const dates: Date[] = [];
@@ -33,13 +31,20 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
 
   const dateRange = generateDateRange(startDate, 730);
 
-  // Find today's index and set the initial week
-  const todayIndex = dateRange.findIndex(date => 
-    date.toDateString() === today.toDateString()
+  // Find the index of the selectedDate and set the current week accordingly
+  const selectedIndex = dateRange.findIndex(date => 
+    date.toDateString() === selectedDate.toDateString()
   );
-  const initialWeekIndex = Math.floor(todayIndex / 7);
+  const initialWeekIndex = selectedIndex !== -1 ? Math.floor(selectedIndex / 7) : 0;
   const [currentWeekIndex, setCurrentWeekIndex] = useState(initialWeekIndex);
-  const [activeDay, setActiveDay] = useState(today);
+
+  useEffect(() => {
+    // When selectedDate changes, update the week index
+    if (selectedIndex !== -1) {
+      setCurrentWeekIndex(Math.floor(selectedIndex / 7));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
 
   const currentWeek = dateRange.slice(currentWeekIndex * 7, (currentWeekIndex + 1) * 7);
 
@@ -48,9 +53,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
     setCurrentWeekIndex((prevIndex) => {
       if (prevIndex > 0) {
         const newIndex = prevIndex - 1;
-        setActiveDay(dateRange[newIndex * 7]);
-        handleDateChange(dateRange[newIndex * 7]);
-        if (onDateChange) onDateChange(dateRange[newIndex * 7]);
+        const newDate = dateRange[newIndex * 7];
+        onDateChange(newDate);
         return newIndex;
       }
       return prevIndex;
@@ -62,9 +66,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
     setCurrentWeekIndex((prevIndex) => {
       if (prevIndex < (dateRange.length / 7) - 1) {
         const newIndex = prevIndex + 1;
-        setActiveDay(dateRange[newIndex * 7]);
-        handleDateChange(dateRange[newIndex * 7]);
-        if (onDateChange) onDateChange(dateRange[newIndex * 7]);
+        const newDate = dateRange[newIndex * 7];
+        onDateChange(newDate);
         return newIndex;
       }
       return prevIndex;
@@ -72,10 +75,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
   };
 
   // Handle day selection
-  const handleDayClick = (selectedDate: Date) => {
-    setActiveDay(selectedDate);
-    handleDateChange(selectedDate);
-    if (onDateChange) onDateChange(selectedDate);
+  const handleDayClick = (selected: Date) => {
+    onDateChange(selected);
   };
 
   return (
@@ -83,7 +84,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange }) => {
       <NavigateLeftButton onClick={handlePrevWeek} />
       <DateSection 
         currentWeek={currentWeek} 
-        activeDay={activeDay} 
+        activeDay={selectedDate} 
         onDayClick={handleDayClick} 
       />
       <NavigateRightButton onClick={handleNextWeek} />

@@ -52,28 +52,33 @@ interface MonthYear {
   year: string;
 }
 
-export const useSchedule = () => {
+export const useSchedule = (apiKey: string | null, date: Date) => {
+  const apiKeyLoading = !apiKey;
+  const apiKeyError = null;
   const [monthYear, setMonthYear] = useState<MonthYear>({ month: '', year: '' });
   const [schedule, setSchedule] = useState<Schedule | null>(null);
-  const [date, setDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSports, setSelectedSports] = useState<string[]>(['NBA', 'F1']); // Default sports
+  // Hardcoded competition slugs for now
+  const [selectedSports, setSelectedSports] = useState<string[]>(["national-basketball-association", "formula-one"]);
+  const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [competitionIds, setCompetitionIds] = useState<string[]>(["national-basketball-association", "formula-one"]);
 
-  const fetchSchedule = useCallback(async (targetDate: Date, sports: string[]) => {
+  const fetchSchedule = useCallback(async (targetDate: Date, sports: string[], tz: string, comps: string[]) => {
+    if (!apiKey) return; // Wait for device registration
     setIsLoading(true);
     setError(null);
-    
+    // Removed setTimezone and setCompetitionIds to prevent infinite loop
     try {
       const dateString = targetDate.toISOString().split('T')[0];
-      const request: ScheduleRequest = {
+      const request = {
         sports,
-        date: dateString
+        date: dateString,
+        timezone: tz,
+        competitionIds: comps,
+        apiKey: apiKey as string
       };
-      
       const response = await spoilerShieldService.getSchedule(request);
-      
-      // Transform to your app's format
       const transformedSchedule = {
         response: response.events.map(event => {
           const baseEvent = {
@@ -88,7 +93,6 @@ export const useSchedule = () => {
               eventDetailValue: event.eventValue || ''
             }
           };
-
           if (event.isHeadToHead && event.teams) {
             return {
               ...baseEvent,
@@ -101,48 +105,54 @@ export const useSchedule = () => {
             return {
               ...baseEvent,
               eventTitle: event.title,
-              eventImage: event.competition.imageUrl, // Use competition image as fallback
+              eventImage: event.competition.imageUrl,
               eventDescription: event.description || ''
             } as MultiCompetitorEvent;
           }
         })
       };
-      
       setSchedule(transformedSchedule);
     } catch (err: any) {
       setError(err.message);
-      console.error('Error fetching schedule:', err);
+      setSchedule(null); // Clear schedule on error
+      // Do not retry automatically
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [apiKey]);
 
   useEffect(() => {
+    if (!apiKey) return; // Wait for device registration
     const updateMonthYear = (date: Date) => {
       const month = date.toLocaleString('default', { month: 'long' });
       const year = date.getFullYear().toString();
       setMonthYear({ month, year });
     };
-
     updateMonthYear(date);
-    fetchSchedule(date, selectedSports);
-  }, [date, selectedSports, fetchSchedule]);
+    fetchSchedule(date, selectedSports, timezone, competitionIds);
+    // No retry logic here; only fetch once per dependency change
+  }, [date, selectedSports, timezone, competitionIds, fetchSchedule, apiKey]);
 
-  const handleDateChange = (newDate: Date) => setDate(newDate);
-  
   const handleSportsChange = (sports: string[]) => {
     setSelectedSports(sports);
   };
+  const handleTimezoneChange = (tz: string) => setTimezone(tz);
+  const handleCompetitionIdsChange = (ids: string[]) => setCompetitionIds(ids);
 
-  return { 
-    date, 
-    monthYear, 
-    schedule, 
-    handleDateChange,
+  return {
+    monthYear,
+    schedule,
     selectedSports,
     handleSportsChange,
-    isLoading, 
+    timezone,
+    setTimezone: handleTimezoneChange,
+    competitionIds,
+    setCompetitionIds: handleCompetitionIdsChange,
+    isLoading,
     error,
-    refetch: () => fetchSchedule(date, selectedSports)
+    refetch: () => fetchSchedule(date, selectedSports, timezone, competitionIds),
+    apiKey,
+    apiKeyLoading,
+    apiKeyError
   };
 }; 
